@@ -34,7 +34,7 @@ const LeaveHistory = ({ role }: { role: UserRole }) => {
   const [loading, setLoading] = useState(true);
   const [filterMonth, setFilterMonth] = useState("");
   const [filterYear, setFilterYear] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterStartDate, setFilterStartDate] = useState("");
   const [filterEndDate, setFilterEndDate] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
