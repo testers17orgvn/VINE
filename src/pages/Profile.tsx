@@ -18,7 +18,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 const profileSchema = z.object({
   first_name: z.string().min(1, "First name is required").max(100),
   last_name: z.string().min(1, "Last name is required").max(100),
-  phone: z.string().optional(),
+  phone: z.string().optional().refine(
+    (val) => !val || /^\d{0,10}$/.test(val),
+    "Phone number must be exactly 10 digits (e.g. 0832686678)"
+  ),
   date_of_birth: z.string().optional(),
 });
 
