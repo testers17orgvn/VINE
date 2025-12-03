@@ -532,6 +532,16 @@ CREATE POLICY "Leaders and admins can update leave requests" ON public.leave_req
  public.has_role(auth.uid(), 'leader') OR public.has_role(auth.uid(), 'admin')
 );
 
+-- NOTIFICATIONS: Notification visibility and management
+DROP POLICY IF EXISTS "Users can view their own notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Users can update their own notifications" ON public.notifications;
+DROP POLICY IF EXISTS "System can insert notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Admins can manage all notifications" ON public.notifications;
+CREATE POLICY "Users can view their own notifications" ON public.notifications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own notifications" ON public.notifications FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "System can insert notifications" ON public.notifications FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admins can manage all notifications" ON public.notifications FOR ALL USING (public.has_role(auth.uid(), 'admin'));
+
 -- AUDIT_LOGS: Audit log visibility
 DROP POLICY IF EXISTS "Admins can view audit logs" ON public.audit_logs;
 DROP POLICY IF EXISTS "System can insert audit logs" ON public.audit_logs;
