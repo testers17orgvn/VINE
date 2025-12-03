@@ -504,7 +504,17 @@ export default function Profile() {
                           <FormControl>
                             <div className="relative">
                               <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input {...field} type="tel" className="pl-10" />
+                              <Input
+                                {...field}
+                                type="tel"
+                                className="pl-10"
+                                maxLength={10}
+                                placeholder="0832686678"
+                                onChange={(e) => {
+                                  const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                  field.onChange(value);
+                                }}
+                              />
                             </div>
                           </FormControl>
                           <FormMessage />
