@@ -192,13 +192,22 @@ const LeaveRequestForm = () => {
       if (error) throw error;
 
       // Create notification for approver
-      await supabase.from('notifications').insert([{
-        user_id: approverId,
-        type: 'leave_request',
-        title: 'New Leave Request',
-        message: `${currentUserId} has requested leave from ${startDate} to ${endDate}`,
-        link: '/leave'
-      }]).catch(err => console.log('Notification creation skipped:', err));
+      const { data: requesterData } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', user.id)
+        .single();
+
+      const requesterName = requesterData
+        ? `${requesterData.first_name} ${requesterData.last_name}`
+        : 'A staff member';
+
+      await createLeaveRequestNotification(
+        approverId,
+        requesterName,
+        startDate,
+        endDate
+      );
 
       toast({
         title: "Success",
