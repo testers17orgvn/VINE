@@ -30,10 +30,16 @@ interface LeaveRequest {
 }
 
 const LeaveHistory = ({ role }: { role: UserRole }) => {
-  const [leaves, setLeaves] = useState<LeaveRequest[]>([]); 
+  const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterMonth, setFilterMonth] = useState("");
   const [filterYear, setFilterYear] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState<any>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchLeaves = useCallback(async () => {
