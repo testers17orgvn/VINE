@@ -164,21 +164,26 @@ vine-crm/
 
 ## 🗄️ Database Schema
 
-### **Core Tables**
+### **Complete Schema (15 Tables)**
 
-| Table | Description |
-|-------|-------------|
-| `users` | User profiles (id, email, role, team_id, shift_id, avatar) |
-| `teams` | Departments and teams (id, name, leader_id) |
-| `shifts` | Work shifts (id, name, start_time, end_time) |
-| `attendance` | Check-in/out logs (user_id, timestamp, location, type) |
-| `tasks` | Work items (id, title, assignee_id, creator_id, deadline, status) |
-| `meeting_rooms` | Conference rooms (id, name, location, capacity, equipment) |
-| `room_bookings` | Meeting reservations (room_id, user_id, start_time, end_time, status) |
-| `leave_requests` | Time-off requests (user_id, type, start_date, end_date, status, approver_id) |
-| `audit_logs` | System activity logs (user_id, action, entity, timestamp) |
+| Category | Tables |
+|----------|--------|
+| **Users & Auth** | profiles, user_roles |
+| **Organization** | teams, shifts |
+| **Work Management** | attendance, tasks, task_columns, task_comments |
+| **Leave Management** | leave_requests, leave_types |
+| **Facilities** | meeting_rooms, room_bookings |
+| **System** | notifications, audit_logs |
 
-> All tables implement **Row-Level Security (RLS)** for data protection.
+### **Key Features**
+- ✅ **Row-Level Security (RLS)** on all sensitive tables
+- ✅ **Auto-timestamp updates** via triggers
+- ✅ **Performance indexes** on frequently queried columns
+- ✅ **Role-based access control** (admin, leader, staff)
+- ✅ **User approval workflow** with rejection handling
+- ✅ **Custom enum types** for statuses and priorities
+
+For detailed schema documentation, see [Database Setup Guide](./supabase.setup.md) and [Database Integration Guide](./DATABASE_INTEGRATION_GUIDE.md)
 
 ---
 
