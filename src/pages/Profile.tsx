@@ -450,6 +450,47 @@ export default function Profile() {
             </CardContent>
           </Card>
 
+          {/* Role and Team Info Card */}
+          <Card className="shadow-medium transition-smooth hover:shadow-strong">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase className="h-5 w-5" />
+                Position & Team
+              </CardTitle>
+              <CardDescription>Your current role and team assignment</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label className="text-sm font-medium">Position</Label>
+                  <div className="mt-2">
+                    {userRole ? (
+                      <div className="inline-flex items-center gap-2 px-3 py-2 bg-primary/10 text-primary rounded-md">
+                        <Briefcase className="h-4 w-4" />
+                        <span className="font-medium capitalize">{userRole.role}</span>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Not assigned</p>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Team</Label>
+                  <div className="mt-2">
+                    {team ? (
+                      <div className="inline-flex items-center gap-2 px-3 py-2 bg-secondary text-secondary-foreground rounded-md">
+                        <Users className="h-4 w-4" />
+                        <span className="font-medium">{team.name}</span>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No team assigned</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* CV Upload Card */}
           <Card className="shadow-medium transition-smooth hover:shadow-strong">
             <CardHeader>
