@@ -123,6 +123,19 @@ export default function Profile() {
         date_of_birth: profileData.date_of_birth || "",
       });
 
+      // Fetch User Role
+      const { data: roleData, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .single();
+
+      if (roleError) {
+        setUserRole({ role: 'staff' });
+      } else {
+        setUserRole(roleData as unknown as UserRole);
+      }
+
       // Xử lý Signed URL cho CV (nếu có cv_url)
       if (profileData && profileData.cv_url) {
         const url = await getSignedUrl(profileData.cv_url);
