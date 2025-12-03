@@ -28,6 +28,9 @@ const CreateBookingDialog = ({ open, onOpenChange, onBookingCreated }: CreateBoo
   useEffect(() => {
     if (open) {
       fetchRooms();
+      const today = new Date().toISOString().split('T')[0];
+      setStartTime(`${today}T09:00`);
+      setEndTime(`${today}T10:00`);
     }
   }, [open]);
 
