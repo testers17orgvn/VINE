@@ -457,13 +457,16 @@ const TeamsManagement = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No Leader</SelectItem>
-                  {users.map((user) => (
+                  {leaders.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {getFullName(user.first_name, user.last_name)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {leaders.length === 0 && (
+                <p className="text-xs text-muted-foreground mt-2">No leaders available. Promote staff to leader role first.</p>
+              )}
             </div>
           </div>
           <DialogFooter>
@@ -509,13 +512,16 @@ const TeamsManagement = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No Leader</SelectItem>
-                  {users.map((user) => (
+                  {leaders.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {getFullName(user.first_name, user.last_name)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {leaders.length === 0 && (
+                <p className="text-xs text-muted-foreground mt-2">No leaders available. Promote staff to leader role first.</p>
+              )}
             </div>
           </div>
           <DialogFooter>
