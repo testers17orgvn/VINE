@@ -184,7 +184,20 @@ const TaskList = ({ role }: { role: UserRole }) => {
                   <Badge>{task.priority}</Badge>
                 </TableCell>
                 <TableCell>
-                  {task.assignee_id ? 'Assigned' : 'Unassigned'}
+                  {task.creator_id ? (
+                    (() => {
+                      const creator = users.find(u => u.id === task.creator_id);
+                      return creator ? `${creator.first_name} ${creator.last_name}` : 'Unknown';
+                    })()
+                  ) : '-'}
+                </TableCell>
+                <TableCell>
+                  {task.assignee_id ? (
+                    (() => {
+                      const assignee = users.find(u => u.id === task.assignee_id);
+                      return assignee ? `${assignee.first_name} ${assignee.last_name}` : 'Assigned';
+                    })()
+                  ) : 'Unassigned'}
                 </TableCell>
                 <TableCell>
                   {task.deadline ? format(new Date(task.deadline), 'MMM dd, yyyy') : '-'}
