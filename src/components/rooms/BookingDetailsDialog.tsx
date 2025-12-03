@@ -17,7 +17,7 @@ interface BookingDetailsDialogProps {
   onDelete?: (bookingId: string) => void;
 }
 
-const BookingDetailsDialog = ({ booking, open, onOpenChange, onJoinLeave }: BookingDetailsDialogProps) => {
+const BookingDetailsDialog = ({ booking, open, onOpenChange, onJoinLeave, onDelete }: BookingDetailsDialogProps) => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [roomName, setRoomName] = useState("");
   const [creatorInfo, setCreatorInfo] = useState<any>(null);
