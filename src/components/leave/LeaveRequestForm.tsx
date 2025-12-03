@@ -221,7 +221,9 @@ const LeaveRequestForm = () => {
     setType("annual");
     setStartDate("");
     setEndDate("");
+    setShiftId("");
     setReason("");
+    setApproverId("");
   };
 
   return (
