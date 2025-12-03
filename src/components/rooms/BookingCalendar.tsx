@@ -24,8 +24,7 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
       const { data, error } = await supabase
         .from('room_bookings')
         .select('*')
-        .gte('start_time', new Date().toISOString())
-        .order('start_time');
+        .order('start_time', { ascending: false });
 
       if (error) throw error;
       setBookings(data || []);
