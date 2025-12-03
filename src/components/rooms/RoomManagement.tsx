@@ -60,6 +60,9 @@ const RoomManagement = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [participantsOpen, setParticipantsOpen] = useState(false);
+  const [roomParticipants, setRoomParticipants] = useState<string[]>([]);
+  const [searchParticipant, setSearchParticipant] = useState("");
   const { toast } = useToast();
 
   // Form states
