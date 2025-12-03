@@ -3,13 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUser } from "@/lib/auth";
 import { UserRole } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Edit2, Trash2 } from "lucide-react";
 import CreateBookingDialog from "./CreateBookingDialog";
 import BookingDetailsDialog from "./BookingDetailsDialog";
+import EditBookingDialog from "./EditBookingDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, addDays } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
 
 const BookingCalendar = ({ role }: { role: UserRole }) => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -17,11 +19,16 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [creatorInfo, setCreatorInfo] = useState<Map<string, any>>(new Map());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const fetchBookings = async () => {
     try {
+      const user = await getCurrentUser();
+      if (user) setCurrentUser(user);
+
       const { data, error } = await supabase
         .from('room_bookings')
         .select('*')
@@ -49,6 +56,26 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
       console.error('Error fetching bookings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (!confirm('Are you sure you want to delete this booking?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('room_bookings')
+        .delete()
+        .eq('id', bookingId);
+
+      if (error) throw error;
+
+      toast.success('Booking deleted successfully');
+      fetchBookings();
+      setDetailsDialogOpen(false);
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+      toast.error('Failed to delete booking');
     }
   };
 
@@ -126,19 +153,22 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
             const endTime = new Date(booking.end_time).getTime();
             const now = new Date().getTime();
             const isPast = endTime < now;
+            const isOrganizer = currentUser && currentUser.id === booking.user_id;
 
             return (
               <Card
                 key={booking.id}
-                className="cursor-pointer hover:bg-secondary/50 transition-colors"
-                onClick={() => {
-                  setSelectedBooking(booking);
-                  setDetailsDialogOpen(true);
-                }}
+                className="hover:bg-secondary/50 transition-colors"
               >
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
-                    <span>{booking.title}</span>
+                    <span
+                      className="cursor-pointer flex-1"
+                      onClick={() => {
+                        setSelectedBooking(booking);
+                        setDetailsDialogOpen(true);
+                      }}
+                    >{booking.title}</span>
                     <div className="flex gap-2">
                       <Badge
                         variant={
@@ -195,6 +225,32 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
                       )}
                     </div>
                   )}
+
+                  {isOrganizer && booking.status !== 'cancelled' && (
+                    <div className="flex gap-2 pt-2 border-t">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedBooking(booking);
+                          setEditDialogOpen(true);
+                        }}
+                        className="flex-1"
+                      >
+                        <Edit2 className="h-4 w-4 mr-2" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteBooking(booking.id)}
+                        className="flex-1"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );
@@ -207,6 +263,14 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
         open={detailsDialogOpen}
         onOpenChange={setDetailsDialogOpen}
         onJoinLeave={fetchBookings}
+        onDelete={() => handleDeleteBooking(selectedBooking?.id)}
+      />
+
+      <EditBookingDialog
+        booking={selectedBooking}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onBookingUpdated={fetchBookings}
       />
 
       <CreateBookingDialog
