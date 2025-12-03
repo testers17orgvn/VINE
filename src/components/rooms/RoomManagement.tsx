@@ -83,6 +83,7 @@ const RoomManagement = () => {
       const { data, error } = await supabase
         .from('meeting_rooms')
         .select('*')
+        .eq('is_active', true)
         .order('name');
 
       if (error) throw error;
