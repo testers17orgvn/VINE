@@ -73,16 +73,23 @@ const TaskList = ({ role }: { role: UserRole }) => {
 
   const getFilteredTasks = () => {
     return tasks.filter(task => {
-      const matchesSearch = !searchQuery || 
+      const matchesSearch = !searchQuery ||
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()));
-      
+
       const matchesStatus = statusFilter === "all" || task.status === statusFilter;
       const matchesPriority = priorityFilter === "all" || task.priority === priorityFilter;
-      const matchesAssignee = assigneeFilter === "all" || 
+      const matchesAssignee = assigneeFilter === "all" ||
         (assigneeFilter === "unassigned" ? !task.assignee_id : task.assignee_id === assigneeFilter);
-      
-      return matchesSearch && matchesStatus && matchesPriority && matchesAssignee;
+
+      let matchesTaskType = true;
+      if (taskTypeFilter === "assigned") {
+        matchesTaskType = task.assignee_id === currentUserId;
+      } else if (taskTypeFilter === "created") {
+        matchesTaskType = task.creator_id === currentUserId;
+      }
+
+      return matchesSearch && matchesStatus && matchesPriority && matchesAssignee && matchesTaskType;
     });
   };
 
