@@ -84,6 +84,10 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
         {bookings.map((booking) => {
           const creator = creatorInfo.get(booking.user_id);
           const attendeeCount = (booking.attendees || []).length;
+          const endTime = new Date(booking.end_time).getTime();
+          const now = new Date().getTime();
+          const isPast = endTime < now;
+
           return (
             <Card
               key={booking.id}
@@ -96,14 +100,22 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>{booking.title}</span>
-                  <Badge
-                    variant={
-                      booking.status === 'approved' ? 'default' :
-                      booking.status === 'rejected' ? 'destructive' : 'secondary'
-                    }
-                  >
-                    {booking.status}
-                  </Badge>
+                  <div className="flex gap-2">
+                    <Badge
+                      variant={
+                        booking.status === 'approved' ? 'default' :
+                        booking.status === 'rejected' ? 'destructive' :
+                        booking.status === 'cancelled' ? 'outline' : 'secondary'
+                      }
+                    >
+                      {booking.status}
+                    </Badge>
+                    {isPast && (
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
+                        Done
+                      </Badge>
+                    )}
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
