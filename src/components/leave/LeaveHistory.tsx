@@ -6,9 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { SkeletonTable } from "@/components/ui/skeleton-table";
+import { Edit2, Trash2 } from "lucide-react";
 
 interface LeaveRequest {
     id: string;
