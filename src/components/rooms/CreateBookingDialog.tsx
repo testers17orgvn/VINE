@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUser } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
+import { createNotification } from "@/lib/notifications";
 
 interface CreateBookingDialogProps {
   open: boolean;
