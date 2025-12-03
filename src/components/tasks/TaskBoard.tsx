@@ -166,21 +166,47 @@ const TaskBoard = ({ role }: { role: UserRole }) => {
 
       const { data, error } = await supabase
         .from('tasks')
-        .select(`
-          *,
-          assignee:assignee_id(id, first_name, last_name, avatar_url),
-          creator:creator_id(id, first_name, last_name, avatar_url)
-        `)
+        .select('*')
         .or(`assignee_id.eq.${user.id},creator_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setTasks(data || []);
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
+
+      if (!data || data.length === 0) {
+        setTasks([]);
+        return;
+      }
+
+      // Fetch creator and assignee info separately
+      const userIds = new Set<string>();
+      data.forEach(task => {
+        if (task.creator_id) userIds.add(task.creator_id);
+        if (task.assignee_id) userIds.add(task.assignee_id);
+      });
+
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .in('id', Array.from(userIds));
+
+      const profileMap = new Map();
+      profileData?.forEach(profile => {
+        profileMap.set(profile.id, profile);
+      });
+
+      const tasksWithProfiles = data.map(task => ({
+        ...task,
+        creator: task.creator_id ? profileMap.get(task.creator_id) : null,
+        assignee: task.assignee_id ? profileMap.get(task.assignee_id) : null
+      }));
+
+      setTasks(tasksWithProfiles);
+    } catch (error: any) {
+      const errorMessage = error?.message || (typeof error === 'string' ? error : JSON.stringify(error));
+      console.error('Error fetching tasks:', errorMessage, error);
       toast({
         title: "Error",
-        description: "Failed to load tasks",
+        description: `Failed to load tasks: ${errorMessage}`,
         variant: "destructive"
       });
     } finally {
