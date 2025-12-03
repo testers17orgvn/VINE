@@ -4,7 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, X, Search } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -12,6 +13,7 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchMyBookings = async () => {
     try {
