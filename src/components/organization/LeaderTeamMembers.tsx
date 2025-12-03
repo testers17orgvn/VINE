@@ -36,6 +36,9 @@ const LeaderTeamMembers = () => {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [loading, setLoading] = useState(true);
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [removing, setRemoving] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
