@@ -19,9 +19,10 @@ const profileSchema = z.object({
   first_name: z.string().min(1, "First name is required").max(100),
   last_name: z.string().min(1, "Last name is required").max(100),
   phone: z.string().optional().refine(
-    (val) => !val || /^\d{0,10}$/.test(val),
-    "Phone number must be exactly 10 digits (e.g. 0832686678)"
-  ),
+  (val) => !val || /^\d{0,15}$/.test(val),
+  "Phone number cannot exceed 15 digits"
+),
+
   date_of_birth: z.string().optional(),
 });
 
@@ -561,10 +562,10 @@ export default function Profile() {
                                 {...field}
                                 type="tel"
                                 className="pl-10"
-                                maxLength={10}
+                                maxLength={15}
                                 placeholder="0832686678"
                                 onChange={(e) => {
-                                  const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                  const value = e.target.value.replace(/\D/g, '').slice(0, 15);
                                   field.onChange(value);
                                 }}
                               />
