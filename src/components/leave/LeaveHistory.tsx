@@ -31,8 +31,10 @@ interface LeaveRequest {
 
 const LeaveHistory = ({ role }: { role: UserRole }) => {
   // Sử dụng kiểu dữ liệu đã định nghĩa
-  const [leaves, setLeaves] = useState<LeaveRequest[]>([]); 
+  const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterMonth, setFilterMonth] = useState("");
+  const [filterYear, setFilterYear] = useState("");
   const { toast } = useToast();
 
   // Dùng useCallback để hàm không bị tạo lại không cần thiết
