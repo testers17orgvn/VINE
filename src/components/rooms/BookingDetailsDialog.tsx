@@ -215,13 +215,19 @@ const BookingDetailsDialog = ({ booking, open, onOpenChange, onJoinLeave, onDele
           <div className="space-y-2">
             {currentUser && currentUser.id === creatorInfo?.id && booking.status !== 'cancelled' && (
               <Button
-                onClick={handleCancelBooking}
+                onClick={() => {
+                  if (onDelete) {
+                    onDelete(booking.id);
+                  } else {
+                    handleCancelBooking();
+                  }
+                }}
                 disabled={isCancelling}
                 className="w-full"
                 variant="destructive"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Cancel Booking
+                Delete Booking
               </Button>
             )}
             {currentUser && currentUser.id !== creatorInfo?.id && (
