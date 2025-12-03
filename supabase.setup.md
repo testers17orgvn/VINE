@@ -869,5 +869,56 @@ ALTER FUNCTION public.has_role(uuid, app_role) SET search_path TO public, auth, 
 -- 6. Run sample queries below to verify data integrity
 --
 -- ========================================================
--- 16) VERIFICATION QUERIES
+-- 16) COMPLETE SETUP CHECKLIST
+-- ========================================================
+--
+-- Follow this checklist to ensure complete setup:
+--
+-- DATABASE SETUP (SQL)
+-- [ ] 1. Run ALL SQL commands from sections 1-9 above in Supabase SQL Editor
+-- [ ] 2. Verify all ENUM types created: app_role, leave_type, leave_status, task_status, task_priority, booking_status, attendance_type
+-- [ ] 3. Verify all tables created (15 tables total):
+--       - teams, shifts, user_roles, profiles, attendance
+--       - task_columns, tasks, task_comments
+--       - meeting_rooms, room_bookings
+--       - leave_types, leave_requests
+--       - notifications, audit_logs
+-- [ ] 4. Verify all functions created: has_role(), get_user_team(), update_updated_at_column(), handle_new_user()
+-- [ ] 5. Verify all triggers created (9 total)
+-- [ ] 6. Verify RLS is enabled on all tables (14 total)
+-- [ ] 7. Verify all RLS policies created
+-- [ ] 8. Verify all indexes created (11 total)
+--
+-- STORAGE SETUP (MANUAL - SUPABASE DASHBOARD)
+-- [ ] 1. Go to Storage section in Supabase Dashboard
+-- [ ] 2. Click "New Bucket" → Create bucket named "avatars"
+--       - Make it Public
+--       - Set file size limit: 5MB
+-- [ ] 3. Click "New Bucket" → Create bucket named "documents"
+--       - Make it Private
+--       - Set file size limit: 20MB
+--
+-- FIRST USER SETUP
+-- [ ] 1. Sign up first user via the application
+-- [ ] 2. Update user role to admin (run SQL):
+--       UPDATE user_roles SET role = 'admin' WHERE user_id = 'FIRST_USER_ID';
+-- [ ] 3. Mark user as approved (run SQL):
+--       UPDATE profiles SET is_approved = true WHERE id = 'FIRST_USER_ID';
+-- [ ] 4. Test login with first user
+--
+-- APPLICATION FEATURES (ALREADY IMPLEMENTED)
+-- ✅ User Registration & Login
+-- ✅ User Approval Workflow
+-- ✅ Role Management (staff ↔ leader)
+-- ✅ Admin Approval Interface
+-- ✅ Attendance Tracking with Admin View
+-- ✅ Task Management with Kanban Board
+-- ✅ Leave Requests with Custom Types
+-- ✅ Meeting Room Bookings
+-- ✅ User Profiles with Teams and Shifts
+-- ✅ All RLS Security Policies
+-- ✅ File Storage (avatars, documents)
+--
+-- ========================================================
+-- 17) VERIFICATION QUERIES
 -- ========================================================
