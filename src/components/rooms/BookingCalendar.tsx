@@ -26,6 +26,9 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
 
   const fetchBookings = async () => {
     try {
+      const user = await getCurrentUser();
+      if (user) setCurrentUser(user);
+
       const { data, error } = await supabase
         .from('room_bookings')
         .select('*')
@@ -53,6 +56,26 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
       console.error('Error fetching bookings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (!confirm('Are you sure you want to delete this booking?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('room_bookings')
+        .delete()
+        .eq('id', bookingId);
+
+      if (error) throw error;
+
+      toast.success('Booking deleted successfully');
+      fetchBookings();
+      setDetailsDialogOpen(false);
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+      toast.error('Failed to delete booking');
     }
   };
 
