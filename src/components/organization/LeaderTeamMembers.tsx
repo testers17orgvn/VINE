@@ -178,6 +178,7 @@ const LeaderTeamMembers = () => {
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Shift</TableHead>
+                  <TableHead className="w-20">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -187,6 +188,20 @@ const LeaderTeamMembers = () => {
                     <TableCell>{member.email}</TableCell>
                     <TableCell>{member.phone || "-"}</TableCell>
                     <TableCell>{getShiftName(member.shift_id)}</TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          setSelectedMember(member);
+                          setRemoveDialogOpen(true);
+                        }}
+                        className="gap-1"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        Remove
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -194,6 +209,27 @@ const LeaderTeamMembers = () => {
           </div>
         )}
       </CardContent>
+
+      {/* Remove Member Alert Dialog */}
+      <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Team Member?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove {selectedMember && getFullName(selectedMember.first_name, selectedMember.last_name)} from your team? They can be added back later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogCancel disabled={removing}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleRemoveMember}
+            disabled={removing}
+            className="bg-destructive hover:bg-destructive/90"
+          >
+            {removing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Remove
+          </AlertDialogAction>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };
