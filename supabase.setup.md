@@ -749,10 +749,125 @@ ALTER FUNCTION public.has_role(uuid, app_role) SET search_path TO public, auth, 
 -- ✓ Default shifts (AM/PM) initialized
 -- ✓ Storage policies for file uploads
 --
--- Next steps:
--- 1. Create storage buckets: "avatars" and "documents"
--- 2. CREATE AND DEPLOY THE EDGE FUNCTION for secure user deletion.
--- 3. Set up storage policies for avatars and documents
--- 4. Test all RLS policies thoroughly
--- 5. Monitor database activity for any suspicious patterns
--- 6. Verify default shifts were created with: SELECT * FROM public.shifts;
+-- ========================================================
+-- 13) STORAGE BUCKETS SETUP (MANUAL - VIA SUPABASE DASHBOARD)
+-- ========================================================
+--
+-- IMPORTANT: Storage buckets cannot be created via SQL.
+-- Follow these steps in Supabase Dashboard:
+--
+-- 1. Go to Supabase Dashboard → Storage
+-- 2. Create Bucket: "avatars"
+--    - Visibility: Public
+--    - File size limit: 5 MB
+-- 3. Create Bucket: "documents"
+--    - Visibility: Private
+--    - File size limit: 20 MB
+--
+-- The RLS storage policies for these buckets are already created above.
+--
+-- ========================================================
+-- 14) EDGE FUNCTION FOR USER DELETION (OPTIONAL)
+-- ========================================================
+--
+-- If you need to securely delete users with admin privileges,
+-- deploy this Edge Function to your Supabase project:
+--
+-- File: supabase/functions/delete-user/index.ts
+--
+-- import { serve } from "https://deno.land/std@0.175.0/http/server.ts"
+-- import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+--
+-- interface DeleteRequest {
+--   userId: string
+-- }
+--
+-- serve(async (req: Request) => {
+--   if (req.method !== "POST") {
+--     return new Response("Method not allowed", { status: 405 })
+--   }
+--
+--   const authHeader = req.headers.get("Authorization")
+--   if (!authHeader) {
+--     return new Response("Missing authorization header", { status: 401 })
+--   }
+--
+--   const supabaseAdmin = createClient(
+--     Deno.env.get("SUPABASE_URL") || "",
+--     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+--   )
+--
+--   const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(
+--     authHeader.replace("Bearer ", "")
+--   )
+--
+--   if (authError || !user) {
+--     return new Response("Unauthorized", { status: 401 })
+--   }
+--
+--   // Check if user is admin
+--   const { data: roleData } = await supabaseAdmin
+--     .from("user_roles")
+--     .select("role")
+--     .eq("user_id", user.id)
+--     .single()
+--
+--   if (roleData?.role !== "admin") {
+--     return new Response("Forbidden: Admin access required", { status: 403 })
+--   }
+--
+--   const body: DeleteRequest = await req.json()
+--   const targetUserId = body.userId
+--
+--   // Delete the user from Auth
+--   const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
+--     targetUserId
+--   )
+--
+--   if (deleteError) {
+--     return new Response(
+--       JSON.stringify({ error: deleteError.message }),
+--       { status: 400 }
+--     )
+--   }
+--
+--   return new Response(
+--     JSON.stringify({ success: true, message: "User deleted successfully" }),
+--     { status: 200, headers: { "Content-Type": "application/json" } }
+--   )
+-- })
+--
+-- Deploy with: supabase functions deploy delete-user
+--
+-- ========================================================
+-- 15) FEATURE STATUS & IMPLEMENTATION NOTES
+-- ========================================================
+--
+-- ✅ FULLY IMPLEMENTED:
+-- - User authentication with email verification
+-- - User approval workflow (is_approved, approval_rejected fields)
+-- - Role management (admin, leader, staff)
+-- - Attendance tracking (check-in/check-out)
+-- - Task management with custom columns and priorities
+-- - Leave requests with custom leave types
+-- - Meeting room bookings with approval workflow
+-- - User profiles with team assignment
+-- - RLS policies for all tables
+-- - Storage for avatars and CV uploads
+--
+-- ⚠️  PARTIALLY IMPLEMENTED:
+-- - Notifications table exists but UI for notification management not yet built
+-- - Audit logging table exists but audit log viewing UI not yet implemented
+-- - Meeting room bookings can be viewed but detailed analytics not yet built
+--
+-- 📋 RECOMMENDED NEXT STEPS:
+-- 1. Create storage buckets "avatars" and "documents" in Supabase Dashboard
+-- 2. (Optional) Deploy the delete-user Edge Function for secure user deletion
+-- 3. Test all authentication flows thoroughly
+-- 4. Verify user approval workflow works end-to-end
+-- 5. Test all RLS policies with different user roles
+-- 6. Run sample queries below to verify data integrity
+--
+-- ========================================================
+-- 16) VERIFICATION QUERIES
+-- ========================================================
