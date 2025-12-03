@@ -108,6 +108,38 @@ const LeaderTeamMembers = () => {
     return [firstName, lastName].filter(Boolean).join(" ") || "N/A";
   };
 
+  const handleRemoveMember = async () => {
+    if (!selectedMember) return;
+
+    setRemoving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ team_id: null })
+        .eq('id', selectedMember.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `${getFullName(selectedMember.first_name, selectedMember.last_name)} has been removed from the team`
+      });
+
+      setMembers(members.filter(m => m.id !== selectedMember.id));
+      setRemoveDialogOpen(false);
+      setSelectedMember(null);
+    } catch (error) {
+      console.error('Error removing member:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove team member",
+        variant: "destructive"
+      });
+    } finally {
+      setRemoving(false);
+    }
+  };
+
   if (loading) {
     return (
       <Card>
