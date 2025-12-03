@@ -40,13 +40,7 @@ const LeaveHistory = ({ role }: { role: UserRole }) => {
 
       let query = supabase
         .from('leave_requests')
-        .select(`
-          *,
-          profiles:user_id (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (role === 'staff') {
@@ -56,7 +50,25 @@ const LeaveHistory = ({ role }: { role: UserRole }) => {
       const { data, error } = await query;
       if (error) throw error;
 
-      setLeaves(data as unknown as LeaveRequest[] || []);
+      if (data) {
+        const leaveDataWithProfiles = await Promise.all(
+          data.map(async (leave: any) => {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('id', leave.user_id)
+              .single();
+
+            return {
+              ...leave,
+              profiles: profile
+            };
+          })
+        );
+        setLeaves(leaveDataWithProfiles as LeaveRequest[]);
+      } else {
+        setLeaves([]);
+      }
     } catch (error) {
       console.error('Error fetching leaves:', error instanceof Error ? error.message : JSON.stringify(error));
     } finally {
