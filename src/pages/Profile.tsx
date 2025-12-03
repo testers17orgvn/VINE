@@ -69,6 +69,7 @@ export default function Profile() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [team, setTeam] = useState<Team | null>(null);
   const [shift, setShift] = useState<Shift | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   // State cho Signed URL của CV (để hiển thị link tải về bảo mật)
   const [cvSignedUrl, setCvSignedUrl] = useState<string | null>(null);
 
