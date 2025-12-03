@@ -23,6 +23,7 @@ const BookingDetailsDialog = ({ booking, open, onOpenChange, onJoinLeave }: Book
   const [participants, setParticipants] = useState<any[]>([]);
   const [isJoining, setIsJoining] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     if (open && booking) {
