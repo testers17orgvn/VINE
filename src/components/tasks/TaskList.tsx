@@ -19,7 +19,9 @@ const TaskList = ({ role }: { role: UserRole }) => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [assigneeFilter, setAssigneeFilter] = useState("all");
+  const [taskTypeFilter, setTaskTypeFilter] = useState("all");
   const [users, setUsers] = useState<any[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string>("");
 
   const fetchUsers = async () => {
     try {
@@ -39,9 +41,12 @@ const TaskList = ({ role }: { role: UserRole }) => {
       const user = await getCurrentUser();
       if (!user) return;
 
+      setCurrentUserId(user.id);
+
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
+        .or(`assignee_id.eq.${user.id},creator_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
