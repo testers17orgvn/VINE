@@ -14,6 +14,7 @@ interface BookingDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onJoinLeave?: () => void;
+  onDelete?: (bookingId: string) => void;
 }
 
 const BookingDetailsDialog = ({ booking, open, onOpenChange, onJoinLeave }: BookingDetailsDialogProps) => {
