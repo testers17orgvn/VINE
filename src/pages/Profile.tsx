@@ -19,9 +19,11 @@ const profileSchema = z.object({
   first_name: z.string().min(1, "First name is required").max(100),
   last_name: z.string().min(1, "Last name is required").max(100),
   phone: z.string().optional().refine(
-    (val) => !val || /^\d{0,15}$/.test(val),
-    "Phone number cannot exceed 15 digits"
-  ),
+
+  (val) => !val || /^\d{0,15}$/.test(val),
+  "Phone number cannot exceed 15 digits"
+),
+
 
   date_of_birth: z.string().optional(),
 });
