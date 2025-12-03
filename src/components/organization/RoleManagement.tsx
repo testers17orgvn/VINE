@@ -22,9 +22,11 @@ interface UserWithRole {
     last_name: string | null;
     email: string;
     avatar_url: string | null;
-    cv_url: string | null; 
+    cv_url: string | null;
+    team_id: string | null;
+    team_name: string | null;
     current_role: 'admin' | 'leader' | 'staff';
-    new_role: 'leader' | 'staff'; 
+    new_role: 'leader' | 'staff';
     changed: boolean;
 }
 
