@@ -675,18 +675,52 @@ ADD COLUMN IF NOT EXISTS custom_type_id UUID REFERENCES public.leave_types(id) O
 -- (Giữ nguyên phần hướng dẫn Admin Queries)
 
 -- ========================================================
--- 11) SETUP COMPLETE & FINAL CONFIGURATION
+-- 11) SEED DATA & DEFAULT VALUES
+-- ========================================================
+
+-- Initialize default shifts (AM/PM)
+INSERT INTO public.shifts (name, start_time, end_time)
+VALUES
+  ('AM', '08:00:00'::TIME, '12:00:00'::TIME),
+  ('PM', '13:00:00'::TIME, '17:00:00'::TIME)
+ON CONFLICT DO NOTHING;
+
+-- ========================================================
+-- 12) SETUP COMPLETE & FINAL CONFIGURATION
 -- ========================================================
 
 -- BỔ SUNG: Cấu hình bảo mật cho hàm has_role để hỗ trợ Edge Function
 -- (Ngăn chặn việc tìm kiếm đường dẫn nếu không phải là Admin/Service Role)
 ALTER FUNCTION public.has_role(uuid, app_role) SET search_path TO public, auth, pg_temp;
 
+-- ========================================================
+-- USEFUL SQL QUERIES FOR ADMINISTRATION & DEBUGGING
+-- ========================================================
+
+-- Get all tables with row counts
+-- SELECT schemaname, tablename, pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) FROM pg_tables
+-- WHERE schemaname = 'public' ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+
+-- Verify RLS is enabled on critical tables
+-- SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename IN (
+--   'profiles', 'tasks', 'room_bookings', 'leave_requests', 'attendance'
+-- );
+
+-- Check default shifts exist
+-- SELECT id, name, start_time, end_time FROM public.shifts ORDER BY start_time;
+
+-- Get admin users
+-- SELECT p.id, p.email, p.first_name, p.last_name, ur.role
+-- FROM profiles p
+-- LEFT JOIN user_roles ur ON p.id = ur.user_id
+-- WHERE ur.role = 'admin';
 
 -- Database is now fully configured with:
 -- ✓ All tables created with proper relationships
 -- ✓ RLS policies finalized and deployed
 -- ✓ Tasks table updated to preserve history (ON DELETE SET NULL)
+-- ✓ Default shifts (AM/PM) initialized
+-- ✓ Storage policies for file uploads
 --
 -- Next steps:
 -- 1. Create storage buckets: "avatars" and "documents"
@@ -694,3 +728,4 @@ ALTER FUNCTION public.has_role(uuid, app_role) SET search_path TO public, auth, 
 -- 3. Set up storage policies for avatars and documents
 -- 4. Test all RLS policies thoroughly
 -- 5. Monitor database activity for any suspicious patterns
+-- 6. Verify default shifts were created with: SELECT * FROM public.shifts;
