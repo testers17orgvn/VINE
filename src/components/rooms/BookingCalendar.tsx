@@ -3,11 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUser } from "@/lib/auth";
 import { UserRole } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import CreateBookingDialog from "./CreateBookingDialog";
 import BookingDetailsDialog from "./BookingDetailsDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -18,6 +18,7 @@ const BookingCalendar = ({ role }: { role: UserRole }) => {
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [creatorInfo, setCreatorInfo] = useState<Map<string, any>>(new Map());
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const fetchBookings = async () => {
     try {
