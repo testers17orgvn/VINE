@@ -22,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Edit2, Trash2, Plus, MapPin, Users, Monitor, X } from "lucide-react";
+import { Edit2, Trash2, Plus, MapPin, Monitor, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
