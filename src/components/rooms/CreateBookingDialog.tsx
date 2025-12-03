@@ -127,7 +127,7 @@ const CreateBookingDialog = ({ open, onOpenChange, onBookingCreated }: CreateBoo
         return;
       }
 
-      const { error } = await supabase.from('room_bookings').insert([{
+      const { data: bookingData, error } = await supabase.from('room_bookings').insert([{
         title,
         description: description || null,
         room_id: roomId,
@@ -135,9 +135,31 @@ const CreateBookingDialog = ({ open, onOpenChange, onBookingCreated }: CreateBoo
         start_time: startTime,
         end_time: endTime,
         status: 'pending'
-      }]);
+      }]).select();
 
       if (error) throw error;
+
+      // Create notification for admins/leaders about new booking
+      const { data: adminUsers } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .in('role', ['admin', 'leader'])
+        .neq('user_id', user.id);
+
+      if (adminUsers && adminUsers.length > 0) {
+        const roomData = rooms.find(r => r.id === roomId);
+        const roomName = roomData?.name || 'Unknown Room';
+
+        for (const admin of adminUsers) {
+          await createNotification({
+            userId: admin.user_id,
+            type: 'booking',
+            title: 'New Room Booking',
+            message: `New booking created: "${title}" in ${roomName}`,
+            link: '/meeting-rooms'
+          });
+        }
+      }
 
       toast({
         title: "Success",
