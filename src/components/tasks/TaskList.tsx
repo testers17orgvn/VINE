@@ -97,17 +97,53 @@ const TaskList = ({ role }: { role: UserRole }) => {
 
   return (
     <div className="space-y-4">
-      <TaskSearchFilter
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        priorityFilter={priorityFilter}
-        onPriorityChange={setPriorityFilter}
-        assigneeFilter={assigneeFilter}
-        onAssigneeChange={setAssigneeFilter}
-        users={users}
-      />
+      <div className="space-y-4">
+        <div className="flex gap-4 flex-wrap items-center">
+          <TaskSearchFilter
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            statusFilter={statusFilter}
+            onStatusChange={setStatusFilter}
+            priorityFilter={priorityFilter}
+            onPriorityChange={setPriorityFilter}
+            assigneeFilter={assigneeFilter}
+            onAssigneeChange={setAssigneeFilter}
+            users={users}
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => setTaskTypeFilter("all")}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                taskTypeFilter === "all"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              }`}
+            >
+              All Tasks
+            </button>
+            <button
+              onClick={() => setTaskTypeFilter("assigned")}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                taskTypeFilter === "assigned"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              }`}
+            >
+              Assigned to Me
+            </button>
+            <button
+              onClick={() => setTaskTypeFilter("created")}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                taskTypeFilter === "created"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              }`}
+            >
+              Created by Me
+            </button>
+          </div>
+        </div>
+      </div>
       <div className="border rounded-lg">
         <Table>
           <TableHeader>
