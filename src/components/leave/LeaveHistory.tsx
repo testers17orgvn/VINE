@@ -299,7 +299,7 @@ const LeaveHistory = ({ role }: { role: UserRole }) => {
 
     const matchMonth = !filterMonth || leaveMonth === filterMonth;
     const matchYear = !filterYear || leaveYear === filterYear;
-    const matchStatus = !filterStatus || leave.status === filterStatus;
+    const matchStatus = !filterStatus || filterStatus === 'all' || leave.status === filterStatus;
 
     let matchDateRange = true;
     if (filterStartDate || filterEndDate) {
