@@ -88,6 +88,28 @@ const CreateTaskDialog = ({ open, onOpenChange, onTaskCreated, columns = [] }: C
         throw new Error("Task was not created");
       }
 
+      // Create notification for assignee
+      if (assigneeId) {
+        const assignee = users.find(u => u.id === assigneeId);
+        if (assignee && user) {
+          const { data: creatorData } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', user.id)
+            .single();
+
+          const creatorName = creatorData
+            ? `${creatorData.first_name} ${creatorData.last_name}`
+            : 'Someone';
+
+          await createTaskNotification(
+            assigneeId,
+            title.trim(),
+            creatorName
+          );
+        }
+      }
+
       toast({
         title: "Success",
         description: "Task created successfully"
