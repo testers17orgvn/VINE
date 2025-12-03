@@ -232,6 +232,11 @@ const LeaveRequestForm = () => {
         <CardTitle>Submit Leave Request</CardTitle>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <p className="text-sm text-blue-900">
+            Leave balance: <strong>{Math.max(0, leaveBalance)} requests remaining</strong>
+          </p>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="type">Leave Type *</Label>
@@ -280,6 +285,38 @@ const LeaveRequestForm = () => {
           </div>
 
           <div>
+            <Label htmlFor="shift">Shift *</Label>
+            <Select value={shiftId} onValueChange={setShiftId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select shift" />
+              </SelectTrigger>
+              <SelectContent>
+                {shifts.map(shift => (
+                  <SelectItem key={shift.id} value={shift.id}>
+                    {shift.name} ({shift.start_time} - {shift.end_time})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="approver">To (Approver) *</Label>
+            <Select value={approverId} onValueChange={setApproverId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select approver" />
+              </SelectTrigger>
+              <SelectContent>
+                {approvers.map(approver => (
+                  <SelectItem key={approver.id} value={approver.id}>
+                    {approver.first_name} {approver.last_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
             <Label htmlFor="reason">Reason</Label>
             <Textarea
               id="reason"
@@ -291,7 +328,7 @@ const LeaveRequestForm = () => {
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading || leaveBalance <= 0}>
               {loading ? "Submitting..." : "Submit Request"}
             </Button>
           </div>
