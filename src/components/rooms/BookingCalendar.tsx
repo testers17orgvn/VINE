@@ -3,13 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUser } from "@/lib/auth";
 import { UserRole } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Edit2, Trash2 } from "lucide-react";
 import CreateBookingDialog from "./CreateBookingDialog";
 import BookingDetailsDialog from "./BookingDetailsDialog";
+import EditBookingDialog from "./EditBookingDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, addDays } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
 
 const BookingCalendar = ({ role }: { role: UserRole }) => {
   const [bookings, setBookings] = useState<any[]>([]);
