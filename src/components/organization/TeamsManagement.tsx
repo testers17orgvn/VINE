@@ -109,17 +109,29 @@ const TeamsManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
         .select("id, first_name, last_name, email, team_id")
         .order("first_name");
 
-      if (error) {
-        console.warn("Error fetching users:", error);
+      if (profilesError) {
+        console.warn("Error fetching users:", profilesError);
       }
 
-      const validUsers = (data || []).filter((user) => user.id && user.id.trim() !== "");
+      const { data: rolesData, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("user_id, role");
+
+      if (rolesError) {
+        console.warn("Error fetching user roles:", rolesError);
+      }
+
+      const roleMap = new Map((rolesData || []).map(r => [r.user_id, r.role]));
+      const validUsers = (profilesData || []).filter((user) => user.id && user.id.trim() !== "");
+      const leaderUsers = validUsers.filter((user) => roleMap.get(user.id) === 'leader');
+
       setUsers(validUsers);
+      setLeaders(leaderUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
