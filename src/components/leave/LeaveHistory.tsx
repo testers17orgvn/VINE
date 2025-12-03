@@ -169,6 +169,125 @@ const LeaveHistory = ({ role }: { role: UserRole }) => {
     }
   };
 
+  const handleDelete = async (leaveId: string) => {
+    if (!confirm('Are you sure you want to delete this leave request?')) return;
+
+    try {
+      setDeleting(leaveId);
+      const { error } = await supabase
+        .from('leave_requests')
+        .delete()
+        .eq('id', leaveId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Leave request deleted"
+      });
+
+      fetchLeaves();
+    } catch (error) {
+      console.error('Error deleting leave:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete leave request",
+        variant: "destructive"
+      });
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const handleEditStart = (leave: LeaveRequest) => {
+    setEditingId(leave.id);
+    setEditData({
+      start_date: leave.start_date,
+      end_date: leave.end_date,
+      reason: leave.reason
+    });
+  };
+
+  const handleEditSave = async (leaveId: string) => {
+    try {
+      if (!editData.start_date || !editData.end_date) {
+        toast({
+          title: "Error",
+          description: "Start date and end date are required",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (editData.start_date > editData.end_date) {
+        toast({
+          title: "Error",
+          description: "Start date must be before or equal to end date",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const user = await getCurrentUser();
+      if (!user) return;
+
+      // Check for duplicate dates
+      const { data: existingRequests, error: checkError } = await supabase
+        .from('leave_requests')
+        .select('start_date, end_date, status')
+        .eq('user_id', user.id)
+        .neq('id', leaveId)
+        .in('status', ['pending', 'approved']);
+
+      if (checkError) throw checkError;
+
+      const newStart = new Date(editData.start_date).getTime();
+      const newEnd = new Date(editData.end_date).getTime();
+
+      const hasConflict = existingRequests?.some(req => {
+        const existingStart = new Date(req.start_date).getTime();
+        const existingEnd = new Date(req.end_date).getTime();
+        return !(newEnd < existingStart || newStart > existingEnd);
+      });
+
+      if (hasConflict) {
+        toast({
+          title: "Error",
+          description: "You already have a leave request for this date range",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('leave_requests')
+        .update({
+          start_date: editData.start_date,
+          end_date: editData.end_date,
+          reason: editData.reason
+        })
+        .eq('id', leaveId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Leave request updated"
+      });
+
+      setEditingId(null);
+      setEditData(null);
+      fetchLeaves();
+    } catch (error) {
+      console.error('Error updating leave:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update leave request",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return <SkeletonTable rows={6} columns={role === 'leader' || role === 'admin' ? 7 : 5} />;
   }
