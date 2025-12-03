@@ -55,11 +55,11 @@ const EDGE_FUNCTION_URL = 'https://tyverlryifverobjwauo.supabase.co/functions/v1
     const loadUsersWithRoles = useCallback(async () => {
         try {
             setLoading(true);
-            
+
             // LƯU Ý: Nếu lỗi schema vẫn xuất hiện, hãy chạy Supabase CLI
             const { data: profiles, error: profilesError } = await supabase
                 .from('profiles')
-                .select('id, first_name, last_name, email, avatar_url, cv_url')
+                .select('id, first_name, last_name, email, avatar_url, cv_url, team_id')
                 .order('first_name');
 
             if (profilesError) throw profilesError;
@@ -70,14 +70,22 @@ const EDGE_FUNCTION_URL = 'https://tyverlryifverobjwauo.supabase.co/functions/v1
 
             if (rolesError) throw rolesError;
 
+            const { data: teams, error: teamsError } = await supabase
+                .from('teams')
+                .select('id, name');
+
+            if (teamsError) console.warn('Error loading teams:', teamsError);
+
+            const teamMap = new Map((teams || []).map(t => [t.id, t.name]));
+
             const usersWithRoles = (profiles || [])
                 .filter(profile => {
                     const role = roles?.find(r => r.user_id === profile.id)?.role || 'staff';
-                    return role !== 'admin'; 
+                    return role !== 'admin';
                 })
                 .map(profile => {
                     const role = (roles?.find(r => r.user_id === profile.id)?.role || 'staff') as 'admin' | 'leader' | 'staff';
-                    
+
                     // Đảm bảo new_role không bao giờ là 'admin'
                     const initialRole = (role === 'admin' ? 'staff' : role) as 'leader' | 'staff';
 
@@ -87,7 +95,9 @@ const EDGE_FUNCTION_URL = 'https://tyverlryifverobjwauo.supabase.co/functions/v1
                         last_name: profile.last_name,
                         email: profile.email,
                         avatar_url: profile.avatar_url,
-                        cv_url: profile.cv_url, 
+                        cv_url: profile.cv_url,
+                        team_id: profile.team_id,
+                        team_name: profile.team_id ? teamMap.get(profile.team_id) || null : null,
                         current_role: role,
                         new_role: initialRole,
                         changed: false
