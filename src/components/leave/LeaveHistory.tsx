@@ -38,37 +38,42 @@ const LeaveHistory = ({ role }: { role: UserRole }) => {
       const user = await getCurrentUser();
       if (!user) return;
 
-      let query = supabase
+      const leaveQuery = supabase
         .from('leave_requests')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (role === 'staff') {
-        query = query.eq('user_id', user.id);
+        leaveQuery.eq('user_id', user.id);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
+      const { data: leaveData, error: leaveError } = await leaveQuery;
+      if (leaveError) throw leaveError;
 
-      if (data) {
-        const leaveDataWithProfiles = await Promise.all(
-          data.map(async (leave: any) => {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('first_name, last_name')
-              .eq('id', leave.user_id)
-              .single();
-
-            return {
-              ...leave,
-              profiles: profile
-            };
-          })
-        );
-        setLeaves(leaveDataWithProfiles as LeaveRequest[]);
-      } else {
+      if (!leaveData || leaveData.length === 0) {
         setLeaves([]);
+        return;
       }
+
+      const userIds = [...new Set(leaveData.map(l => l.user_id))];
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', userIds);
+
+      if (profileError) console.warn('Error loading profile data:', profileError);
+
+      const profileMap = (profileData || []).reduce((acc: any, p: any) => {
+        acc[p.id] = p;
+        return acc;
+      }, {});
+
+      const leavesWithProfiles = leaveData.map(leave => ({
+        ...leave,
+        profiles: profileMap[leave.user_id] || null
+      }));
+
+      setLeaves(leavesWithProfiles as LeaveRequest[]);
     } catch (error) {
       console.error('Error fetching leaves:', error instanceof Error ? error.message : JSON.stringify(error));
     } finally {
