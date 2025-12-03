@@ -356,6 +356,7 @@ const EDGE_FUNCTION_URL = 'https://tyverlryifverobjwauo.supabase.co/functions/v1
                                     <TableRow>
                                         <TableHead>User</TableHead>
                                         <TableHead>Email</TableHead>
+                                        <TableHead>Team</TableHead>
                                         <TableHead>Documents</TableHead>
                                         <TableHead>Current Role</TableHead>
                                         <TableHead>New Role</TableHead>
